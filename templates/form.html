@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment Analysis</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script>
+      function clearResults() {
+        document.getElementById("results-section").style.display = "none";
+        document.getElementById("upload-form").reset();
+      }
+      function showResults() {
+        document.getElementById("results-section").style.display = "block";
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4">Sentiment Analysis For Customer Reviews</h1>
+      <p class="text-center mb-2">
+        Upload your file to analyze the sentiments in your reviews.
+      </p>
+
+      <div class="form-section">
+        <form
+          action="/index"
+          method="post"
+          id="upload-form"
+          enctype="multipart/form-data"
+          class="mb-4"
+          onsubmit="showResults()"
+        >
+          <div class="form-group">
+            <label for="file">Upload a CSV or TSV file with reviews:</label>
+            <input
+              type="file"
+              class="form-control-file"
+              id="file"
+              name="file"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            Upload and Analyze
+          </button>
+        </form>
+        <div class="text-center mt-4">
+          <button class="btn btn-danger btn-block" onclick="clearResults()">
+            Clear Results
+          </button>
+        </div>
+        {% if error %}
+        <div class="alert alert-danger mt-4" role="alert">{{ error }}</div>
+        {% endif %}
+      </div>
+
+      {% if pie_chart and wordcloud_positive and wordcloud_negative %}
+      <div class="result-section" id="results-section">
+        <div class="chart-container text-center mb-4">
+          <h2>Pie Chart of Sentiment Analysis</h2>
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <h3>Positive vs. Negative</h3>
+              <img
+                src="data:image/png;base64,{{ pie_chart }}"
+                class="img-fluid"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="chart-container text-center mb-4">
+          <h5>Accuaracy of Model : 93%</h5>
+        </div>
+
+        <div class="wordcloud-container text-center mb-4">
+          <div class="row">
+            <div class="col-md-6">
+              <h2 class="text-success">Word Cloud - Positive Sentiment</h2>
+              <img src="data:image/png;base64,{{ wordcloud_positive }}" />
+            </div>
+            <div class="col-md-6">
+              <h2 class="text-danger">Word Cloud - Negative Sentiment</h2>
+              <img src="data:image/png;base64,{{ wordcloud_negative }}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <a href="{{ url_for('download_file') }}" class="btn btn-primary"
+            >Download Output File</a
+          >
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </body>
+</html>
